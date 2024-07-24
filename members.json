@@ -1,0 +1,405 @@
+[
+  {
+    "id": 1,
+    "name": "Emily Green",
+    "dateOfBirth": "1992-09-12",
+    "gender": "Female",
+    "policyNumber": "HIP-54321",
+    "planType": "Individual",
+    "coverageStartDate": "2023-01-01",
+    "primaryCarePhysician": "Dr. Alice White",
+    "contactNumber": "+1 (555) 789-1234",
+    "email": "emily.green@example.com",
+    "address": {
+      "street": "12 Health St",
+      "city": "Wellville",
+      "state": "CA",
+      "zipCode": "90210"
+    },
+    "claims": [
+      {
+        "id": "CLM-101",
+        "date": "2023-04-01",
+        "type": "Wellness Check",
+        "provider": "Wellville Clinic",
+        "amount": 200.00,
+        "status": "Approved"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 200.00,
+      "outOfPocketMax": 1500.00,
+      "outOfPocketUsed": 200.00
+    },
+    "premiumAmount": 100.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Wellness Pharmacy",
+    "chronicConditions": [],
+    "acuteConditions": ["Seasonal Allergies"],
+    "question1": "What are the best exercises to maintain overall health?",
+    "question2": "How can I improve my diet?",
+    "question3": "What wellness programs are available to me?",
+    "question4": "What are the best vitamins and supplements for overall health?",
+    "question5": "Can you recommend any mindfulness or meditation resources?",
+    "architype": "Wellness Seekers"
+  },
+  {
+    "id": 2,
+    "name": "Michael Brown",
+    "dateOfBirth": "1975-05-20",
+    "gender": "Male",
+    "policyNumber": "HIP-98765",
+    "planType": "Family",
+    "coverageStartDate": "2023-02-01",
+    "primaryCarePhysician": "Dr. John Taylor",
+    "contactNumber": "+1 (555) 456-7890",
+    "email": "michael.brown@example.com",
+    "address": {
+      "street": "34 Chronic Ln",
+      "city": "Manageville",
+      "state": "TX",
+      "zipCode": "75001"
+    },
+    "dependents": [
+      {
+        "name": "Sarah Brown",
+        "relationship": "Spouse",
+        "dateOfBirth": "1977-06-15"
+      },
+      {
+        "name": "Tom Brown",
+        "relationship": "Child",
+        "dateOfBirth": "2005-10-30"
+      }
+    ],
+    "claims": [
+      {
+        "id": "CLM-201",
+        "date": "2023-03-10",
+        "type": "Chronic Condition Checkup",
+        "provider": "Manageville Health Center",
+        "amount": 300.00,
+        "status": "Approved"
+      },
+      {
+        "id": "CLM-202",
+        "date": "2023-05-15",
+        "type": "Medication Refill",
+        "provider": "Manageville Pharmacy",
+        "amount": 50.00,
+        "status": "Pending"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 350.00,
+      "outOfPocketMax": 2000.00,
+      "outOfPocketUsed": 350.00
+    },
+    "premiumAmount": 400.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Manageville Pharmacy",
+    "chronicConditions": ["Type 1 Diabetes", "Hypertension"],
+    "acuteConditions": [],
+    "question1": "How can I manage my diabetes effectively?",
+    "question2": "What are the best foods for hypertension?",
+    "question3": "How often should I check my blood pressure?",
+    "question4": "How can I monitor my blood sugar levels at home?",
+    "question5": "What are some lifestyle changes that can help manage hypertension?",
+    "architype": "Patients with Chronic Illness"
+  },
+  {
+    "id": 3,
+    "name": "Sophia Lee",
+    "dateOfBirth": "1988-01-15",
+    "gender": "Female",
+    "policyNumber": "HIP-13579",
+    "planType": "Individual",
+    "coverageStartDate": "2023-03-01",
+    "primaryCarePhysician": "Dr. Emma Wilson",
+    "contactNumber": "+1 (555) 321-6547",
+    "email": "sophia.lee@example.com",
+    "address": {
+      "street": "56 Acute Blvd",
+      "city": "Suddenville",
+      "state": "FL",
+      "zipCode": "33101"
+    },
+    "claims": [
+      {
+        "id": "CLM-301",
+        "date": "2023-06-05",
+        "type": "Urgent Care Visit",
+        "provider": "Suddenville Urgent Care",
+        "amount": 100.00,
+        "status": "Approved"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 100.00,
+      "outOfPocketMax": 1000.00,
+      "outOfPocketUsed": 100.00
+    },
+    "premiumAmount": 150.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Suddenville Pharmacy",
+    "chronicConditions": [],
+    "acuteConditions": ["Flu", "Sprained Wrist"],
+    "question1": "What are the best treatments for the flu?",
+    "question2": "How should I care for a sprained wrist?",
+    "question3": "Can you recommend a flu vaccine location?",
+    "question4": "What over-the-counter medications are safe for flu symptoms?",
+    "question5": "How can I speed up the recovery of a sprained wrist?",
+    "architype": "Patients with Acute Illness"
+  },
+  {
+    "id": 4,
+    "name": "William Johnson",
+    "dateOfBirth": "1945-02-20",
+    "gender": "Male",
+    "policyNumber": "HIP-24681",
+    "planType": "Senior",
+    "coverageStartDate": "2023-04-01",
+    "primaryCarePhysician": "Dr. Olivia Adams",
+    "contactNumber": "+1 (555) 654-9870",
+    "email": "william.johnson@example.com",
+    "address": {
+      "street": "78 Elder Ave",
+      "city": "Agetown",
+      "state": "NY",
+      "zipCode": "10001"
+    },
+    "claims": [
+      {
+        "id": "CLM-401",
+        "date": "2023-07-10",
+        "type": "Routine Checkup",
+        "provider": "Agetown Clinic",
+        "amount": 150.00,
+        "status": "Approved"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 150.00,
+      "outOfPocketMax": 1200.00,
+      "outOfPocketUsed": 150.00
+    },
+    "premiumAmount": 200.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Agetown Pharmacy",
+    "chronicConditions": ["Arthritis", "Hypertension"],
+    "acuteConditions": [],
+    "question1": "What exercises are safe for arthritis?",
+    "question2": "How can I manage my blood pressure?",
+    "question3": "Are there any senior health programs available?",
+    "question4": "What should I include in my daily diet to stay healthy as I age?",
+    "question5": "Are there any home safety tips to prevent falls?",
+    "architype": "Geriatric Patients"
+  },
+  {
+    "id": 5,
+    "name": "Rachel Evans",
+    "dateOfBirth": "1995-07-10",
+    "gender": "Female",
+    "policyNumber": "HIP-36912",
+    "planType": "Family",
+    "coverageStartDate": "2023-05-01",
+    "primaryCarePhysician": "Dr. Linda Roberts",
+    "contactNumber": "+1 (555) 789-6540",
+    "email": "rachel.evans@example.com",
+    "address": {
+      "street": "90 Maternal St",
+      "city": "Familyville",
+      "state": "OH",
+      "zipCode": "44101"
+    },
+    "dependents": [
+      {
+        "name": "Liam Evans",
+        "relationship": "Child",
+        "dateOfBirth": "2023-03-15"
+      }
+    ],
+    "claims": [
+      {
+        "id": "CLM-501",
+        "date": "2023-03-15",
+        "type": "Maternity Care",
+        "provider": "Familyville Hospital",
+        "amount": 2000.00,
+        "status": "Approved"
+      },
+      {
+        "id": "CLM-502",
+        "date": "2023-06-20",
+        "type": "Pediatric Checkup",
+        "provider": "Familyville Pediatric Clinic",
+        "amount": 150.00,
+        "status": "Approved"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 2150.00,
+      "outOfPocketMax": 5000.00,
+      "outOfPocketUsed": 2150.00
+    },
+    "premiumAmount": 500.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Familyville Pharmacy",
+    "chronicConditions": [],
+    "acuteConditions": [],
+    "pregnancyStatus": "Postpartum",
+    "question1": "What are the best postpartum exercises?",
+    "question2": "How do I ensure proper nutrition for my newborn?",
+    "question3": "What vaccinations does my baby need?",
+    "question4": "How often should I schedule pediatric check-ups for my newborn?",
+    "question5": "What are the best resources for breastfeeding support?",
+    "architype": "Maternal and Child Health"
+  },{
+    "id": 6,
+    "name": "David Miller",
+    "dateOfBirth": "1983-11-22",
+    "gender": "Male",
+    "policyNumber": "HIP-74123",
+    "planType": "Individual",
+    "coverageStartDate": "2023-06-01",
+    "primaryCarePhysician": "Dr. Karen Thompson",
+    "contactNumber": "+1 (555) 123-9876",
+    "email": "david.miller@example.com",
+    "address": {
+      "street": "123 Mental Rd",
+      "city": "Mindville",
+      "state": "MA",
+      "zipCode": "02101"
+    },
+    "claims": [
+      {
+        "id": "CLM-601",
+        "date": "2023-07-10",
+        "type": "Therapy Session",
+        "provider": "Mindville Mental Health Center",
+        "amount": 150.00,
+        "status": "Approved"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 150.00,
+      "outOfPocketMax": 1000.00,
+      "outOfPocketUsed": 150.00
+    },
+    "premiumAmount": 200.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Mindville Pharmacy",
+    "chronicConditions": ["Depression"],
+    "acuteConditions": [],
+    "question1": "What are the best strategies for managing depression?",
+    "question2": "How can I find a support group?",
+    "question3": "What are the latest treatments for depression?",
+    "question4": "How can I manage stress and anxiety on a daily basis?",
+    "question5": "Are there any online therapy options available?",
+    "architype": "Mental Health Patients"
+  },
+  {
+    "id": 7,
+    "name": "Jessica Thompson",
+    "dateOfBirth": "1998-02-28",
+    "gender": "Female",
+    "policyNumber": "HIP-85236",
+    "planType": "Individual",
+    "coverageStartDate": "2023-07-01",
+    "primaryCarePhysician": "Dr. Robert King",
+    "contactNumber": "+1 (555) 456-3210",
+    "email": "jessica.thompson@example.com",
+    "address": {
+      "street": "456 Trauma St",
+      "city": "Recoveryville",
+      "state": "CA",
+      "zipCode": "90210"
+    },
+    "claims": [
+      {
+        "id": "CLM-701",
+        "date": "2023-07-15",
+        "type": "Emergency Room Visit",
+        "provider": "Recoveryville General Hospital",
+        "amount": 5000.00,
+        "status": "Approved"
+      },
+      {
+        "id": "CLM-702",
+        "date": "2023-07-20",
+        "type": "Follow-up Visit",
+        "provider": "Recoveryville Clinic",
+        "amount": 200.00,
+        "status": "Pending"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 5200.00,
+      "outOfPocketMax": 10000.00,
+      "outOfPocketUsed": 5200.00
+    },
+    "premiumAmount": 600.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Recoveryville Pharmacy",
+    "chronicConditions": [],
+    "acuteConditions": ["Fractured Leg"],
+    "question1": "What are the best rehabilitation exercises for a fractured leg?",
+    "question2": "How can I manage pain from my injury?",
+    "question3": "What are my options for physical therapy?",
+    "question4": "What are the signs that I might need further medical attention for my injury?",
+    "question5": "How can I stay active while recovering from a fractured leg?",
+    "architype": "Trauma Patients"
+  },
+  {
+    "id": 8,
+    "name": "Robert White",
+    "dateOfBirth": "1950-12-05",
+    "gender": "Male",
+    "policyNumber": "HIP-96321",
+    "planType": "Senior",
+    "coverageStartDate": "2023-05-01",
+    "primaryCarePhysician": "Dr. Linda Green",
+    "contactNumber": "+1 (555) 789-4321",
+    "email": "robert.white@example.com",
+    "address": {
+      "street": "789 Palliative Ln",
+      "city": "Careville",
+      "state": "NY",
+      "zipCode": "10001"
+    },
+    "claims": [
+      {
+        "id": "CLM-801",
+        "date": "2023-06-15",
+        "type": "Palliative Care Visit",
+        "provider": "Careville Hospice",
+        "amount": 1000.00,
+        "status": "Approved"
+      }
+    ],
+    "planUsage": {
+      "deductibleMet": 1000.00,
+      "outOfPocketMax": 5000.00,
+      "outOfPocketUsed": 1000.00
+    },
+    "premiumAmount": 700.00,
+    "paymentFrequency": "Monthly",
+    "lastPaymentDate": "2023-07-01",
+    "preferredPharmacy": "Careville Pharmacy",
+    "chronicConditions": ["Advanced Cancer"],
+    "acuteConditions": [],
+    "question1": "What palliative care options are available?",
+    "question2": "How can I manage pain effectively?",
+    "question3": "Are there support groups for family members?",
+    "question4": "What options are available for managing end-of-life care at home?",
+    "question5": "How can I prepare my family for my end-of-life care needs?",
+    "architype": "Palliative Patients"
+  }
+]
