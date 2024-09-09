@@ -1,6 +1,3 @@
-<html>
-  <body>
-
 ## Airtable_Agents 
 
 {
@@ -2547,5 +2544,3 @@
   "if": "if (zepMetadataFilter) {\n            zepConfig.filter = typeof zepMetadataFilter === 'object' ? zepMetadataFilter : JSON.parse(zepMetadataFilter)\n        }",
   "outsideClass_zepCollection": "const zepCollection = nodeData.inputs?.zepCollection as string\n            const docs = nodeData.inputs?.document as Document[]\n            const credentialData = await getCredentialData(nodeData.credential ?? '', options)\n            const apiKey = getCredentialParam('apiKey', credentialData, nodeData)\n            const flattenDocs = docs && docs.length ? flatten(docs) : []\n            const finalDocs = []\n            for (let i = 0; i < flattenDocs.length; i += 1) {\n                if (flattenDocs[i] && flattenDocs[i].pageContent) {\n                    finalDocs.push(new Document(flattenDocs[i]))\n                }\n            }\n            const client = new ZepClient({\n                apiKey: apiKey\n            })\n            const zepConfig = {\n                apiKey: apiKey,\n                collectionName: zepCollection,\n                client\n            }\n            try {\n                await ZepVectorStore.fromDocuments(finalDocs, new FakeEmbeddings(), zepConfig)\n                return { numAdded: finalDocs.length, addedDocs: finalDocs }\n            } catch (e) {\n                throw new Error(e)\n            }\n        }\n    }\n\n    async init(nodeData: INodeData, _: string, options: ICommonObject): Promise<any> {\n        const zepCollection = nodeData.inputs?.zepCollection as string\n        const zepMetadataFilter = nodeData.inputs?.zepMetadataFilter\n        const credentialData = await getCredentialData(nodeData.credential ?? '', options)\n        const apiKey = getCredentialParam('apiKey', credentialData, nodeData)\n\n        const zepConfig: IZepConfig & Partial<ZepFilter> = {\n            apiKey,\n            collectionName: zepCollection\n        }\n        if (zepMetadataFilter) {\n            zepConfig.filter = typeof zepMetadataFilter === 'object' ? zepMetadataFilter : JSON.parse(zepMetadataFilter)\n        }\n        zepConfig.client = new ZepClient({\n            apiKey: apiKey\n        })\n        const vectorStore = await ZepExistingVS.init(zepConfig)\n        return resolveVectorStoreOrRetriever(nodeData, vectorStore, zepConfig.filter)\n    }\n}\n\ninterface ZepFilter {\n    filter: Record<string, any>\n}"
 }
-</body>
-</html>
