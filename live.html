@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Issue #72 — Real-Time Voice + TTS · Discussion Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz@0,6..72;1,6..72&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --ink: #1a1714;
+    --ink-soft: #4a443d;
+    --paper: #f4f0e8;
+    --paper-card: #fbf8f2;
+    --line: #ddd5c6;
+    --line-strong: #c5bba6;
+    --accent: #9a3412;        /* burnt sienna */
+    --accent-soft: #c2603a;
+    --green: #3f6f4a;
+    --green-bg: #e7efe5;
+    --amber: #9a6b00;
+    --amber-bg: #f5ecd2;
+    --red: #8f2f24;
+    --red-bg: #f3e0db;
+    --blue: #2f5d7c;
+    --blue-bg: #e2ebf1;
+    --shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 30px -18px rgba(40,30,15,.45);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 12% -5%, rgba(154,52,18,.05), transparent 40%),
+      radial-gradient(circle at 95% 8%, rgba(47,93,124,.05), transparent 35%);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 28px 120px; }
+
+  /* ---- Masthead ---- */
+  header.mast {
+    padding: 64px 0 30px;
+    border-bottom: 3px double var(--line-strong);
+    margin-bottom: 14px;
+  }
+  .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(38px, 6vw, 62px);
+    line-height: 1.02;
+    letter-spacing: -.02em;
+    margin: 0 0 18px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .standfirst {
+    font-size: 21px;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    margin: 0 0 26px;
+  }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 10px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px; color: var(--ink-soft);
+    letter-spacing: .02em;
+  }
+  .meta-row b { color: var(--ink); font-weight: 600; }
+
+  /* ---- TOC ---- */
+  nav.toc {
+    background: var(--paper-card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 20px 26px;
+    margin: 34px 0 56px;
+    box-shadow: var(--shadow);
+  }
+  nav.toc h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--ink-soft); margin: 0 0 14px;
+  }
+  nav.toc ol { margin: 0; padding: 0; list-style: none; counter-reset: toc; columns: 2; column-gap: 40px; }
+  nav.toc li { counter-increment: toc; margin: 0 0 9px; break-inside: avoid; font-size: 16px; }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+  nav.toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--accent); margin-right: 10px;
+  }
+
+  /* ---- Sections ---- */
+  section { margin: 0 0 64px; scroll-margin-top: 24px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.01em;
+    margin: 0 0 6px; padding-top: 14px;
+    display: flex; align-items: baseline; gap: 14px;
+  }
+  h2 .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500;
+    color: var(--accent); flex: none;
+  }
+  h2 + .sub {
+    color: var(--ink-soft); font-style: italic; margin: 0 0 22px;
+    border-bottom: 1px solid var(--line); padding-bottom: 18px;
+  }
+  h3 {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 21px;
+    margin: 30px 0 8px; letter-spacing: -.01em;
+  }
+  p { margin: 0 0 16px; }
+  strong { font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: .82em;
+    background: #efe9dd; padding: 1.5px 6px; border-radius: 3px;
+    color: var(--accent); border: 1px solid #e3dbc9;
+  }
+  .path { color: var(--blue); }
+
+  pre {
+    background: #211d18; color: #e9e2d3; border-radius: 6px;
+    padding: 18px 20px; overflow-x: auto; font-size: 13.5px; line-height: 1.6;
+    font-family: 'JetBrains Mono', monospace; margin: 18px 0;
+    box-shadow: var(--shadow);
+  }
+  pre code { background: none; border: none; color: inherit; padding: 0; font-size: inherit; }
+  pre .c { color: #8a8270; font-style: italic; }
+  pre .k { color: #d98b5f; }
+  pre .s { color: #a3b88c; }
+  pre .d { color: #6f93ab; }
+
+  /* ---- Callouts ---- */
+  .box {
+    border-radius: 5px; padding: 18px 22px; margin: 22px 0;
+    border: 1px solid var(--line); background: var(--paper-card);
+    position: relative; box-shadow: var(--shadow);
+  }
+  .box .lab {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: .2em; text-transform: uppercase; font-weight: 600;
+    display: inline-block; margin-bottom: 8px;
+  }
+  .box p:last-child { margin-bottom: 0; }
+  .box.rule  { border-left: 5px solid var(--accent); }
+  .box.rule .lab { color: var(--accent); }
+  .box.good  { border-left: 5px solid var(--green); background: var(--green-bg); }
+  .box.good .lab { color: var(--green); }
+  .box.warn  { border-left: 5px solid var(--amber); background: var(--amber-bg); }
+  .box.warn .lab { color: var(--amber); }
+  .box.danger{ border-left: 5px solid var(--red); background: var(--red-bg); }
+  .box.danger .lab { color: var(--red); }
+  .box.open  { border-left: 5px solid var(--blue); background: var(--blue-bg); }
+  .box.open .lab { color: var(--blue); }
+
+  /* ---- Tables ---- */
+  .tbl-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--line); border-radius: 5px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; background: var(--paper-card); }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--ink-soft); background: #efe9dd; font-weight: 600;
+  }
+  tr:last-child td { border-bottom: none; }
+  td .yes { color: var(--green); font-weight: 600; }
+  td .no  { color: var(--red); font-weight: 600; }
+  td .mb  { color: var(--amber); font-weight: 600; }
+
+  /* ---- Lists ---- */
+  ul.clean, ol.clean { margin: 16px 0; padding-left: 24px; }
+  ul.clean li, ol.clean li { margin-bottom: 10px; }
+  ul.clean li::marker { color: var(--accent); }
+  ol.clean li::marker { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: .85em; }
+
+  /* ---- Status pills ---- */
+  .pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px;
+    border-radius: 100px; display: inline-block; vertical-align: middle;
+  }
+  .pill.agreed { background: var(--green-bg); color: var(--green); border: 1px solid #b9d0b3; }
+  .pill.openq  { background: var(--blue-bg);  color: var(--blue);  border: 1px solid #b8cdda; }
+  .pill.verified { background: #e8e1f0; color: #5b3f86; border: 1px solid #cdbde6; }
+  .pill.built { background: #f5ecd2; color: var(--amber); border: 1px solid #e3d3a0; }
+
+  /* fork cards */
+  .fork { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 22px 0; }
+  .fork.three { grid-template-columns: 1fr 1fr 1fr; }
+  .fork .opt { background: var(--paper-card); border: 1px solid var(--line); border-radius: 6px; padding: 20px 22px; box-shadow: var(--shadow); }
+  .fork .opt.lean { border: 2px solid var(--green); }
+  .fork .opt h4 { font-family:'Fraunces',serif; font-size: 19px; margin: 0 0 4px; }
+  .fork .opt .tag { font-family:'JetBrains Mono',monospace; font-size: 11px; letter-spacing:.1em; text-transform:uppercase; color: var(--accent); }
+  .fork .opt .tag.win { color: var(--green); }
+  .fork .opt ul { margin: 12px 0 0; padding-left: 18px; font-size: 14.5px; }
+  .fork .opt ul li { margin-bottom: 7px; }
+  @media (max-width: 680px) { .fork, .fork.three { grid-template-columns: 1fr; } nav.toc ol { columns: 1; } }
+
+  hr.div { border: none; border-top: 1px solid var(--line); margin: 50px 0; }
+
+  footer {
+    margin-top: 60px; padding-top: 24px; border-top: 3px double var(--line-strong);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-soft);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .disclaimer {
+    font-style: italic; color: var(--ink-soft); font-size: 16px;
+    background: #efe9dd; border: 1px dashed var(--line-strong); border-radius: 5px;
+    padding: 14px 20px; margin: 0 0 40px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="kicker">Discussion Notes · Not a Spec</p>
+    <h1>Real-Time <em>Voice</em> in the Chat View</h1>
+    <p class="standfirst">Working notes from talking through GitHub Issue&nbsp;#72. How to bolt hands-free voice onto the existing EA chat experience — one brain, one conversation, one chat view — using ElevenLabs Speech Engine for the audio and the AI&nbsp;SDK for the mind. Captures what's verified, what's built, and the decisions still open.</p>
+    <div class="meta-row">
+      <span><b>Issue</b> #72 · voice + TTS</span>
+      <span><b>Status</b> design in progress</span>
+      <span><b>Built</b> voice-server scaffold (Fly, validated)</span>
+      <span><b>Settled</b> 7.1 brain-on-Vercel · 7.3 voice-gate</span>
+      <span><b>Open</b> 7.2 persistence</span>
+    </div>
+  </header>
+
+  <p class="disclaimer">Design artifact for issue&nbsp;#72. Captures the emerging architecture for in-browser real-time voice, verified against the ElevenLabs Speech Engine docs, the installed SDK source, the AI&nbsp;SDK v6 docs, and this codebase. Discussion reference — not a line-by-line spec. Two decisions now settled (7.1, 7.3); persistence (7.2) remains open — see §07.</p>
+
+  <nav class="toc">
+    <h4>Contents</h4>
+    <ol>
+      <li><a href="#vision">The vision</a></li>
+      <li><a href="#terms">What Speech Engine is</a></li>
+      <li><a href="#notsdk">Why not the AI SDK alone</a></li>
+      <li><a href="#onebrain">One brain, two surfaces</a></li>
+      <li><a href="#lanes">The three lanes</a></li>
+      <li><a href="#sync">The sync mechanism</a></li>
+      <li><a href="#constraint">Voice can't start a chat</a></li>
+      <li><a href="#lifecycle">Request→response lifecycle</a></li>
+      <li><a href="#decisions">The decisions (7.1–7.3)</a></li>
+      <li><a href="#voicegate">The voice-gate primitive</a></li>
+      <li><a href="#built">What's already built</a></li>
+      <li><a href="#risks">Risks &amp; edges</a></li>
+      <li><a href="#checklist">Implementation checklist</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 -->
+  <section id="vision">
+    <h2><span class="num">01</span> The vision</h2>
+    <p class="sub">The stakeholder's intent, stated crisply.</p>
+
+    <div class="box rule">
+      <span class="lab">What we're building</span>
+      <p>In the chat view there is a <strong>"Live" button</strong>. Click it and a <strong>visualizer</strong> appears that reacts to both the user's voice and the agent's voice. The user has a <strong>hands-free conversation</strong> with EA. <strong>At the same time, the conversation is happening in the UI</strong> — appearing as messages in the chat — whether or not the chat UI is focused, <strong>on the same URL</strong>. No phone call. All in-browser. In the correct chat view.</p>
+    </div>
+
+    <div class="box good">
+      <span class="lab">Verified achievable</span>
+      <p>Every element of this maps directly onto what ElevenLabs Speech Engine provides. Nothing in the vision requires a capability Speech Engine lacks. The hard part is <strong>not</strong> the voice transport — it's <strong>syncing the spoken conversation into the existing chat-message machinery</strong> (§05–06) and deciding where the EA brain runs (§07).</p>
+    </div>
+
+    <div class="box rule">
+      <span class="lab">One-lane principle</span>
+      <p>Stakeholder preference: <strong>one lane</strong>, not two. Voice and text are the <em>same conversation</em> in the <em>same chat thread</em> (<code>chatId</code>), interleaving freely. The chat UI may be <strong>passive</strong> during voice (it reflects what's said; it doesn't need to drive interactive widgets). This shapes every decision below.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="terms">
+    <h2><span class="num">02</span> What Speech Engine actually is</h2>
+    <p class="sub">Dispelling the fog around "sits on top of your existing agent." <span class="pill verified">verified against docs + installed SDK</span></p>
+
+    <p><strong>Speech Engine is not an AI.</strong> It is a real-time <strong>voice I/O wrapper</strong>. It does exactly two things: <strong>STT</strong> (transcribe the user's speech to text) and <strong>TTS</strong> (speak text your server sends back). It also manages connection lifecycle, turn-taking, and interruption detection. That's it. The <em>brain</em> is yours.</p>
+
+    <div class="box good">
+      <span class="lab">ElevenLabs' own words (overview/capabilities/speech-engine)</span>
+      <p>"ElevenLabs Speech Engine adds voice capabilities to <strong>any chat agent</strong>. ElevenLabs handles speech-to-text and text-to-speech <strong>while your server provides the LLM logic.</strong> The SDK manages connection lifecycle, turn-taking, and interruption detection so you can focus on your agent's behavior."</p>
+    </div>
+
+    <p>So <em>"sits on top of your existing agent"</em> means: it wraps voice around the <strong>exact same brain</strong> that powers text chat. ElevenLabs never sees your system prompt, your tools, or your Gemini call. The verified data flow:</p>
+
+    <pre><code><span class="c">// per turn, verified from quickstart Mermaid + SpeechEngineSession.d.ts</span>
+Browser   <span class="d">──audio──►</span>   ElevenLabs   <span class="d">──transcript text──►</span>   YOUR server
+                                                              <span class="c">│</span>
+                                                       YOUR LLM logic
+                                                       (the EA brain)
+                                                              <span class="c">│</span>
+Browser   <span class="d">◄──audio──</span>   ElevenLabs   <span class="d">◄──response text──</span>   session.sendResponse()</code></pre>
+
+    <div class="box good">
+      <span class="lab">You get the text, both sides (verified)</span>
+      <p>On every turn, <code>onTranscript</code> receives the <strong>full conversation history</strong> as <code>TranscriptMessage&nbsp;{ role: "user" | "agent"; content: string }</code>. So the browser always <em>has</em> the text of what was said and what EA replied — which is precisely what we mirror into the chat UI (§06). <code>sendResponse()</code> accepts a string <em>or</em> a streaming async-iterable, and auto-extracts text from OpenAI / Anthropic / <strong>Gemini</strong> stream formats (verified in <span class="path">SpeechEngineSession.d.ts</span> L66–75) — so an AI&nbsp;SDK <code>streamText</code> result pipes straight into TTS.</p>
+    </div>
+
+    <div class="box warn">
+      <span class="lab">The alternative product — ElevenAgents — is the wrong fit</span>
+      <p>ElevenLabs <em>also</em> sells "ElevenAgents," a <strong>fully hosted</strong> solution where <em>they</em> provide the LLM, knowledge base, and tools. That would mean a <strong>second agent</strong> living at ElevenLabs, divorced from our EA brain, prompts, memory, and crisis guardrails. We are deliberately <strong>not</strong> using ElevenAgents. Speech Engine (bring-your-own-LLM) is the correct choice precisely because it keeps the brain ours.</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="notsdk">
+    <h2><span class="num">03</span> Why the AI SDK alone can't do this</h2>
+    <p class="sub">Ruling out the "experimental speech feature" path. <span class="pill verified">verified against AI SDK v6 docs</span></p>
+
+    <p>A natural question: the AI&nbsp;SDK has speech features and supports ElevenLabs — can't we just use those? <strong>No</strong> — they're one-shot, not real-time.</p>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>AI SDK function</th><th>What it does</th><th>Real-time?</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>experimental_generateSpeech</code></td>
+          <td>Complete text string <span class="d">→</span> finished audio blob (<code>result.audio.uint8Array</code>)</td>
+          <td><span class="no">No</span> — one request, one file</td>
+        </tr>
+        <tr>
+          <td><code>experimental_transcribe</code></td>
+          <td>Complete audio file (<code>readFile('audio.mp3')</code>) <span class="d">→</span> finished text</td>
+          <td><span class="no">No</span> — reads a file</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="box danger">
+      <span class="lab">No realtime primitive exists in the AI SDK</span>
+      <p>Checked the full v6 Core + UI surface: there is <strong>no</strong> <code>useVoice</code>/<code>useRealtime</code> hook, <strong>no</strong> speech-to-speech, <strong>no</strong> continuous conversation API. Both speech functions are flagged <em>"experimental"</em> and are discrete request/response. ElevenLabs appears only as a <strong>model provider for those one-shot calls</strong> (<code>eleven_flash_v2_5</code>, <code>scribe_v1</code>), not a realtime layer. Building real-time voice from these primitives would mean hand-rolling mic capture, voice-activity detection, chunking, turn-taking, barge-in, an audio playback queue, and latency management — months of work, and exactly the "cold-start / latency unacceptable" territory we've ruled out.</p>
+    </div>
+
+    <div class="box good">
+      <span class="lab">They're complementary, not competing</span>
+      <p>Speech Engine = the real-time <strong>voice transport</strong> (the thing the AI&nbsp;SDK can't do). The AI&nbsp;SDK = the <strong>brain</strong> (<code>streamText</code> with Gemini + system prompt + tools) — the thing Speech Engine doesn't have. They sit at different layers and we use both.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="onebrain">
+    <h2><span class="num">04</span> One brain, two surfaces — and the fear of two agents</h2>
+    <p class="sub">The stakeholder's central worry: "is there somehow being two agents, one in the app and one on Fly?"</p>
+
+    <div class="box danger">
+      <span class="lab">The real risk, named</span>
+      <p>Today the EA agent is <strong>not a reusable thing</strong> — it's assembled <em>inline</em> inside <span class="path">/api/chat/route.ts</span> (L335): the system-prompt chain (<code>safetyGuardrails + crisisContext + emotionalAlgebra + … + allStepsGranularDraft</code>), the Gemini model, and the 15+ tool map are all hardcoded in the route handler. There is no exportable "EA agent" object. So if we naively copy that into <code>voice-server/src/responders.ts</code>, we'd create a <strong>second agent that drifts</strong>: someone edits a prompt file, text changes, voice doesn't. <strong>That is the trap to avoid.</strong></p>
+    </div>
+
+    <div class="box good">
+      <span class="lab">The fix: extract the brain into one shared module</span>
+      <p>Pull the brain out of the route into something like <span class="path">src/lib/ai/ea-agent.ts</span> that owns the prompt assembly, the model, the tool map, and the <code>streamText</code> config. Then <strong>both</strong> callers use the <em>same</em> module. The route becomes a thin HTTP wrapper; the voice responder becomes a thin transport adapter. <strong>One brain. One source of truth. No drift.</strong></p>
+    </div>
+
+    <pre><code>                   <span class="c">┌──────────────────────────┐</span>
+                   <span class="c">│  src/lib/ai/ea-agent.ts  │</span>   <span class="c">← the ONE agent</span>
+                   <span class="c">│ (prompt + model + tools) │</span>
+                   <span class="c">└────────────┬─────────────┘</span>
+                <span class="c">┌───────────────┴────────────────┐</span>
+                <span class="d">▼</span>                                <span class="d">▼</span>
+   /api/chat/route.ts (Next)          voice responder (Fly)
+   text typing → streams to UI        voice transcript → streams to TTS</code></pre>
+
+    <div class="box warn">
+      <span class="lab">The catch the Fly/Vercel split imposes</span>
+      <p>"Both import the same module" has a logistics cost: <strong>Fly can't <code>import</code> from the Next app</strong> — separate deployments, separate <code>node_modules</code>, separate processes. So sharing the brain is itself a decision (§07.1): either Fly <strong>calls back into a Vercel endpoint</strong> that runs the real brain (one definitive brain on Vercel; an extra network hop), or the brain is extracted into a <strong>shared package</strong> both deployments build (no hop, but Fly then needs Supabase creds + all tool code + RLS). This is the pivotal fork.</p>
+    </div>
+
+    <div class="box rule">
+      <span class="lab">responders.ts lives on Fly — settled</span>
+      <p>To answer the literal question: <code>voice-server/src/responders.ts</code> runs <strong>on the Fly server</strong> (the Node process ElevenLabs dials into over WebSocket). It is <strong>not</strong> in the Next app. Whether it <em>contains</em> brain logic or merely <em>relays</em> to the brain is the §07.1 decision.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section id="lanes">
+    <h2><span class="num">05</span> The three lanes</h2>
+    <p class="sub">The architecture is three independent flows sharing one UI store and one brain.</p>
+
+    <pre><code>        <span class="c">┌─────────────── BROWSER (chat view, same URL) ───────────────┐</span>
+        <span class="c">│</span>  [Live] <span class="d">─►</span> ElevenLabs client SDK (WebRTC audio in/out)        <span class="c">│</span>
+        <span class="c">│</span>      <span class="c">│</span>                    <span class="c">│</span>                                <span class="c">│</span>
+        <span class="c">│</span>      <span class="c">│</span>            <span class="c">┌───────┴────────┐</span>                       <span class="c">│</span>
+        <span class="c">│</span>      <span class="c">│</span>            <span class="d">▼</span>                <span class="d">▼</span>                       <span class="c">│</span>
+        <span class="c">│</span>      <span class="c">│</span>      Visualizer        transcript events             <span class="c">│</span>
+        <span class="c">│</span>      <span class="c">│</span>    (mic+agent audio)  (user+agent text)              <span class="c">│</span>
+        <span class="c">│</span>      <span class="c">│</span>                            <span class="c">│</span>                          <span class="c">│</span>
+        <span class="c">│</span>      <span class="c">│</span>                  setMessages() <span class="d">─►</span> useChat store <span class="d">──────┼─►</span> renders
+        <span class="c">│</span> text typing <span class="d">─►</span> sendMessage() <span class="d">─►</span> /api/chat <span class="d">─►</span> useChat store <span class="c">┘</span>
+        <span class="c">└─────────────────────────────────────────────────────────────┘</span>
+              <span class="d">audio ↕</span>                          <span class="d">transcript text ↕</span>
+        <span class="c">┌─ ElevenLabs ─┐</span>              <span class="c">┌─ Fly: voice-server ──────────┐</span>
+        <span class="c">│</span> STT + TTS    <span class="c">│ ─transcript WS─►</span> <span class="c">│</span> responders.ts <span class="d">→</span> EA brain     <span class="c">│</span>
+        <span class="c">└──────────────┘ ◄─response─</span>   <span class="c">└──────────────────────────────┘</span></code></pre>
+
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Lane</th><th>Path</th><th>Carries</th><th>Touches our servers?</th></tr></thead>
+      <tbody>
+        <tr><td><b>Audio</b></td><td>Browser ↔ ElevenLabs (WebRTC)</td><td>Voice in / voice out; drives the visualizer</td><td><span class="no">No</span></td></tr>
+        <tr><td><b>Transcript</b></td><td>ElevenLabs → Fly → EA brain → back</td><td>The text round-trip that produces EA's reply</td><td><span class="yes">Fly</span></td></tr>
+        <tr><td><b>UI mirror</b></td><td>Browser: transcript events → <code>setMessages</code></td><td>Writes both sides' text into the chat store</td><td><span class="no">No</span> (client-only)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="sync">
+    <h2><span class="num">06</span> The sync mechanism — how voice lands in the chat view</h2>
+    <p class="sub">The unlock that makes the one-lane vision tractable. <span class="pill verified">verified against use-ai-chat.ts</span></p>
+
+    <div class="box good">
+      <span class="lab">The seam: useChat exposes setMessages</span>
+      <p>The chat UI renders whatever is in the <code>useChat</code> message array — and our hook already destructures <strong><code>setMessages</code></strong> (and <code>addToolOutput</code>) from it (<span class="path">src/hooks/use-ai-chat.ts</span> L59). The array isn't only fed by streaming from <code>/api/chat</code>; <strong>we can write to it from any source.</strong> Voice is just another source. So voice <em>does not</em> need to route through <code>/api/chat</code> to appear in the chat — it needs to <strong>mirror its transcript into the <code>useChat</code> store</strong> as it happens.</p>
+    </div>
+
+    <h3>A turn, step by step</h3>
+    <ol class="clean">
+      <li><strong>User speaks.</strong> ElevenLabs transcribes → the <em>browser</em> client SDK fires a user-transcript event → we append a user message via <code>setMessages</code>. The user's words appear in the chat instantly.</li>
+      <li><strong>Simultaneously</strong>, ElevenLabs forwards that transcript to the <em>Fly</em> responder → it calls the EA brain → streams text back → ElevenLabs speaks it.</li>
+      <li><strong>As EA's response streams</strong>, the <em>browser</em> client SDK fires agent-transcript events → we append/update an assistant message via <code>setMessages</code>. EA's spoken words appear as text, live, in sync with the audio.</li>
+    </ol>
+
+    <div class="box rule">
+      <span class="lab">Why this satisfies the vision</span>
+      <p>Both typed and spoken turns ultimately call <code>setMessages</code> on the <strong>same store</strong> for the <strong>same <code>chatId</code></strong>. So the same chat view shows the conversation whether the user spoke or typed — on the same URL, updating live, focused or not. That is the one-lane experience, mechanically.</p>
+    </div>
+
+    <div class="box warn">
+      <span class="lab">But the store is ephemeral — three gaps open up</span>
+      <p>Because voice bypasses <code>/api/chat</code>, the things that route does <em>for free</em> on a text turn do <strong>not</strong> happen on a voice turn: <strong>(1) persistence</strong> to Supabase, <strong>(2) session-context / memory tools</strong> keyed to the conversation, <strong>(3) display-tool</strong> rendering &amp; the usage / survey-gate signals. Voice messages live only in the client array until we deliberately handle each. These three gaps are the §07 decisions.</p>
+    </div>
+  </section>
+
+  <!-- 6b -->
+  <section id="constraint">
+    <h2><span class="num">06b</span> Voice can't start a conversation — and that's a feature</h2>
+    <p class="sub">A single constraint that removes a huge swath of complexity. <span class="pill agreed">agreed</span> <span class="pill verified">verified against chat-creation-flow.md</span></p>
+
+    <div class="box rule">
+      <span class="lab">The constraint</span>
+      <p><strong>Voice is only available inside an already-created chat.</strong> The Live button does <em>not</em> appear on the empty <code>/chat</code> new-chat view — it appears once you're in <code>/chat/{id}</code> with a real conversation. You cannot begin a conversation by talking.</p>
+    </div>
+
+    <p>Why this is correct, not limiting: chat creation has hard requirements that a voice transcript event simply does not carry. Verified from <span class="path">docs/overview/chat-creation-flow.md</span>:</p>
+    <ul class="clean">
+      <li><strong>The client generates <code>chatId</code></strong> (<code>crypto.randomUUID()</code>) before the first send — there's no chat to speak into yet.</li>
+      <li><strong>The pre-survey rides the first <code>/api/chat</code> request body</strong> — it's captured at chat-creation time, client-side React state until then.</li>
+      <li><strong>The title is generated from the first user message</strong> via <code>generateTitleForChat</code>.</li>
+      <li><strong><code>data-new-chat-created</code> drives the URL update</strong> (<code>replaceState</code> → <code>/chat/{id}</code>).</li>
+    </ul>
+
+    <div class="box good">
+      <span class="lab">What the constraint buys us</span>
+      <p><strong>(1) Pre-survey is already satisfied</strong> — you can't reach <code>/chat/{id}</code> without having sent a first message that carried the pre-survey, so voice never has to handle pre-survey capture. <strong>(2) <code>chatId</code> already exists</strong> — voice persistence (§07.2) just appends to a known chat: no creation race, no title generation, no <code>data-new-chat-created</code>. <strong>(3) §07.2 shrinks</strong> from "voice must replicate chat-creation" to the far narrower "given a known <code>chatId</code>, append turns to <code>messages</code>."</p>
+    </div>
+  </section>
+
+  <!-- 6c -->
+  <section id="lifecycle">
+    <h2><span class="num">06c</span> The request→response lifecycle — the anti-"unknown unknowns" inventory</h2>
+    <p class="sub">Everything <span class="path">/api/chat</span> does between "user submits" and "response appears." The route's invisible, load-bearing work — made visible. <span class="pill verified">verified line-by-line against route.ts</span></p>
+
+    <div class="box rule">
+      <span class="lab">Why this section exists</span>
+      <p>The biggest project risk is <strong>silently dropping a side-effect</strong> the route performs today. This is the complete catalogue, each item tagged for how the <strong>brain-on-Vercel</strong> voice path inherits it. <span class="yes">free</span> = comes along automatically when the voice turn runs the shared brain. <span class="mb">work</span> = voice-specific handling required. <span class="no">n/a</span> = doesn't apply to voice (can't start a chat).</p>
+    </div>
+
+    <h3>Pre-stream gates (before the model is called)</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Side-effect</th><th>Voice (brain on Vercel)</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><strong>Auth</strong> — <code>getSession</code>; <code>unauthorized:chat</code> if absent</td><td><span class="mb">work</span> — same check in <code>/api/voice-turn</code></td></tr>
+        <tr><td>2</td><td><strong>Subscription recovery</strong> — <code>getOrCreateSubscription</code></td><td><span class="yes">free</span> — runs in the relay</td></tr>
+        <tr><td>3</td><td><strong>Message-limit / credits</strong> — <code>checkMessageLimit</code>; <code>forbidden:chat</code></td><td><span class="mb">work</span> — credits voice-gate trigger (§08)</td></tr>
+        <tr><td>4</td><td><strong>Post-survey gate</strong> — <code>getOwedPostSurvey</code>; <code>forbidden:pending_survey</code></td><td><span class="mb">work</span> — survey voice-gate trigger (§08)</td></tr>
+        <tr><td>5</td><td><strong>Pre-survey capture</strong> — best-effort write from request body</td><td><span class="no">n/a</span> — can't start a chat by voice (§06b)</td></tr>
+        <tr><td>6</td><td><strong>Empty-message rejection</strong></td><td><span class="yes">free</span> — STT won't send empty; cheap to mirror</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>Chat / message setup</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Side-effect</th><th>Voice (brain on Vercel)</th></tr></thead>
+      <tbody>
+        <tr><td>7</td><td><strong>Chat lookup + ownership</strong> — <code>getChatById</code>; <code>forbidden:chat</code> if another user's</td><td><span class="mb">work</span> — same ownership check</td></tr>
+        <tr><td>8</td><td><strong>Chat creation + AI title</strong></td><td><span class="no">n/a</span> — chat already exists</td></tr>
+        <tr><td>9</td><td><strong>Title upgrade</strong> (placeholder → real)</td><td><span class="no">n/a</span></td></tr>
+        <tr><td>10</td><td><strong>Save user message</strong> (dedup vs. regenerate)</td><td><span class="mb">work</span> — part of §07.2</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>The model call itself</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Side-effect</th><th>Voice (brain on Vercel)</th></tr></thead>
+      <tbody>
+        <tr><td>11</td><td><strong><code>buildCrisisContext(userId)</code></strong> — injects per-user crisis history into the system prompt</td><td><span class="mb">work</span> — <strong>MUST NOT be dropped</strong> (see danger box)</td></tr>
+        <tr><td>12</td><td><strong>System-prompt assembly</strong> — the 8-part chain</td><td><span class="yes">free</span> — shared brain module</td></tr>
+        <tr><td>13</td><td><strong><code>convertToModelMessages</code> + <code>pruneMessages</code></strong> — history shaping</td><td><span class="mb">work</span> — needs the conversation history source (§07.2)</td></tr>
+        <tr><td>14</td><td><strong>Tools</strong> — memory, emotion-lookup, display</td><td><span class="yes">free</span> brain; display tools become voice-gate triggers (§08)</td></tr>
+        <tr><td>15</td><td><strong><code>experimental_context: { chatId, userId }</code></strong> — injected into every tool call</td><td><span class="mb">work</span> — must supply the same context</td></tr>
+        <tr><td>16</td><td><strong><code>stopWhen</code></strong> — <code>stopAfterTextGenerated</code> + <code>stepCountIs(8)</code></td><td><span class="yes">free</span></td></tr>
+        <tr><td>17</td><td><strong><code>thinkingConfig</code></strong> — Gemini medium thinking</td><td><span class="yes">free</span></td></tr>
+        <tr><td>18</td><td><strong><code>smoothStream</code></strong> — word-chunked smoothing</td><td><span class="no">n/a</span> — TTS handles pacing</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>During / after streaming (the two <code>onFinish</code> hooks)</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Side-effect</th><th>Voice (brain on Vercel)</th></tr></thead>
+      <tbody>
+        <tr><td>19</td><td><strong><code>recordMessageUsage</code></strong> — 1 credit, cost, tokens</td><td><span class="mb">work</span> — billing, deliberately tabled (§09)</td></tr>
+        <tr><td>20</td><td><strong><code>data-usage-update</code></strong> stream part — live counter</td><td><span class="mb">work</span> — client gets it differently or skips</td></tr>
+        <tr><td>21</td><td><strong><code>data-post-survey-owed</code></strong> — when <code>completeSession</code> ran this turn</td><td><span class="mb">work</span> — feeds the voice-gate (see danger box)</td></tr>
+        <tr><td>22</td><td><strong><code>persistFinishedMessages</code></strong> — update-or-insert, 3-retry, idempotent</td><td><span class="mb">work</span> — core of §07.2</td></tr>
+        <tr><td>23</td><td><strong>Token stamping</strong> on last assistant message</td><td><span class="mb">work</span> — part of §07.2</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="box danger">
+      <span class="lab">The two side-effects most likely to bite if forgotten</span>
+      <p><strong>#11 <code>buildCrisisContext</code></strong> silently shapes the system prompt with the user's crisis history <em>every turn</em>. Drop it and EA loses crisis awareness <em>specifically in voice</em> — the worst possible place to lose it, since voice users may be the most vulnerable. <strong>This is the #1 thing to not miss.</strong></p>
+      <p><strong>#21 + <code>completeSession</code>'s owing-marker.</strong> Completion can fire <em>mid-voice-turn</em>: EA decides the arc is done → calls <code>completeSession</code> → sets <code>postSurveyOwed</code>. In voice this must <strong>end the voice session and trigger the survey voice-gate</strong> (§08), or the user keeps talking past a completed session and bypasses the mandatory survey.</p>
+    </div>
+
+    <div class="box good">
+      <span class="lab">The reassuring conclusion</span>
+      <p>Because the brain runs on Vercel, <strong>#11–17, #19, #21 all execute in the same shared code</strong> the text route uses. The only genuinely voice-specific work is <strong>history shaping (#13), persistence (#22–23), and the voice-gate teardown signals (#3, #4, #14, #21)</strong>. That's a bounded, knowable list — not a fog. The unknowns are now known.</p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section id="decisions">
+    <h2><span class="num">07</span> The decisions (7.1 settled · 7.2 open · 7.3 settled)</h2>
+    <p class="sub">7.1 and 7.3 are now decided; 7.2 remains, with a narrower framing thanks to §06b. <span class="pill agreed">2 settled</span> <span class="pill openq">1 open</span></p>
+
+    <!-- 7.1 -->
+    <h3>07.1 · Where the EA brain runs for a voice turn <span class="pill agreed">settled · Vercel</span></h3>
+    <div class="box good">
+      <span class="lab">Decision</span>
+      <p><strong>Brain on Vercel; Fly relays.</strong> Fly's <code>responders.ts</code> does <code>fetch()</code> to a new Vercel route (e.g. <code>/api/voice-turn</code>) running the <strong>same shared EA brain</strong> as <code>/api/chat</code>; Fly streams the returned text into ElevenLabs TTS. <strong>One brain, definitively</strong> — memory tools, crisis context, persistence, and RLS all "just work" on Vercel, in the same code the text route uses. Best fit for the "minimize segmentation" preference; the WebRTC token endpoint already lives on Vercel, so the whole server side is consistent. The only cost is one Fly→Vercel hop per turn (tens of ms — negligible for therapy-paced conversation). <em>No reason was found to run the brain on Fly.</em></p>
+    </div>
+    <p class="sub" style="border:none;padding:0;margin:6px 0 0;">Rejected alternative: brain on Fly via a shared package — no per-turn hop, but Fly would need Supabase creds + RLS + all tool code, adding segmentation, surface area, and drift risk. Not worth the latency saving.</p>
+
+    <!-- 7.2 -->
+    <h3>07.2 · How voice turns persist to the DB <span class="pill openq">open</span></h3>
+    <div class="box open">
+      <span class="lab">Narrowed framing (thanks to §06b + 7.1)</span>
+      <p>This is no longer "voice must replicate chat-creation." Because voice only runs inside an <strong>existing <code>chatId</code></strong> (§06b) and the brain already runs <strong>server-side on Vercel</strong> (7.1), the question shrinks to: <em>given a known chat, where does the write happen?</em> The relay endpoint <code>/api/voice-turn</code> is <strong>already on the server with DB + RLS access</strong> — which reopens the calculus below.</p>
+    </div>
+    <div class="fork three">
+      <div class="opt lean">
+        <span class="tag win">Lean (revised)</span>
+        <h4>Relay persists, server-side</h4>
+        <ul>
+          <li>Since <code>/api/voice-turn</code> already runs the brain on Vercel with DB access, it can call the <em>same</em> <code>persistFinishedMessages</code> path the text route uses — user turn in, assistant turn out.</li>
+          <li><strong>Reuses the existing, battle-tested persistence</strong> (update-or-insert, 3-retry, token stamping) with zero new client round-trip.</li>
+          <li>Open sub-question: the client also needs these messages in its <code>useChat</code> array (via <code>setMessages</code> from transcript events) — so reconcile IDs so the server write and the client mirror don't duplicate.</li>
+        </ul>
+      </div>
+      <div class="opt">
+        <span class="tag">Alt</span>
+        <h4>Client → tRPC per turn</h4>
+        <ul>
+          <li>Browser calls a new <code>saveVoiceMessages</code> tRPC after each turn (reuses <code>saveMessages</code> + <code>withRLS</code>).</li>
+          <li>Durable per-turn; but duplicates persistence logic the relay could just do itself.</li>
+        </ul>
+      </div>
+      <div class="opt">
+        <span class="tag">Alt</span>
+        <h4>Flush on session end</h4>
+        <ul>
+          <li>Persist nothing mid-call; write the whole transcript when the live session ends.</li>
+          <li>Simplest — but a dropped connection mid-session loses everything.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box open">
+      <span class="lab">The crux still to resolve</span>
+      <p>Who is the <strong>source of truth for the message IDs</strong> — the client (which mirrors transcript events into <code>useChat</code> via <code>setMessages</code>) or the server relay (which persists)? Whichever generates the ID, the other must use the <em>same</em> one so a page-refresh reload from DB doesn't duplicate what's already on screen. This is the one knot left in 7.2. Tracked in §09 (Risks → "Message ID reconciliation").</p>
+    </div>
+
+    <!-- 7.3 -->
+    <h3>07.3 · Display tools / blocks during voice <span class="pill agreed">settled · voice-gate</span></h3>
+    <div class="box good">
+      <span class="lab">Decision — generalized into one primitive</span>
+      <p>Rather than suppress display tools or render them passively, we <strong>deterministically close the voice connection</strong> whenever the UI needs the user's attention, and <strong>disable the Live button until the condition clears</strong>. EA says something like <em>"take a look at the chat, I need your input,"</em> the user interacts in the UI normally (exactly as in text mode), then re-enables voice. This <strong>unifies four separate problems into one mechanism</strong> — the <strong>voice-gate</strong>. See <a href="#voicegate">§08</a> for the full design. Crucially, this means display tools, crisis lockout, the survey block, and credit exhaustion <em>do not need bespoke voice handling</em> — they all funnel through the same teardown-and-relock primitive.</p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section id="voicegate">
+    <h2><span class="num">08</span> The voice-gate primitive</h2>
+    <p class="sub">One mechanism that resolves four problems: voice and "the user must act in the UI" are mutually exclusive states. <span class="pill agreed">agreed direction</span></p>
+
+    <div class="box rule">
+      <span class="lab">The reframe</span>
+      <p>The hard question "how does voice coexist with UI elements that need input, crisis lockouts, survey blocks, and credit limits?" dissolves once you accept they're <strong>mutually exclusive with an active voice session.</strong> When any voice-incompatible condition becomes true, voice <strong>ends deterministically</strong>, EA verbally hands off to the UI, and the <strong>Live button stays disabled until the condition clears.</strong></p>
+    </div>
+
+    <h3>The four triggers, one primitive</h3>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Trigger</th><th>Today (text mode)</th><th>Voice behavior (via the gate)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Display tool needs input</strong></td><td>widget renders; input bar waits</td><td>close voice → "look at the chat, I need your input" → relock Live until submitted</td></tr>
+        <tr><td><strong>Crisis lockout</strong></td><td><code>CrisisLockoutModal</code> blocks</td><td>close voice → relock Live until lockout clears</td></tr>
+        <tr><td><strong>Post-survey owed</strong></td><td>global block + survey appended</td><td>close voice → relock Live until survey submitted</td></tr>
+        <tr><td><strong>Credits exhausted</strong></td><td><code>forbidden:chat</code> rejection</td><td>close voice → relock Live until credits return</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="box good">
+      <span class="lab">Definition</span>
+      <p>The <strong>voice-gate</strong> = a set of conditions that, when <em>any</em> is true, voice cannot be active. The brain (on Vercel, where it <em>already</em> evaluates every one of these — see the §06c lifecycle) returns a teardown signal alongside or instead of a response, e.g. <code>{ endVoice: true, reason: 'needs_input' | 'crisis' | 'survey' | 'credits' }</code>. The client tears down the ElevenLabs connection and disables Live; the reason drives what EA says on the way out and what UI the user lands in.</p>
+    </div>
+
+    <pre><code><span class="c">// shape of the teardown signal (illustrative, not final)</span>
+<span class="k">type</span> VoiceTurnResult =
+  | { <span class="k">kind</span>: <span class="s">'speak'</span>; text: AsyncIterable&lt;string&gt; }       <span class="c">// normal turn → TTS</span>
+  | { <span class="k">kind</span>: <span class="s">'handoff'</span>; reason:                            <span class="c">// gate engaged → end voice</span>
+        <span class="s">'needs_input'</span> | <span class="s">'crisis'</span> | <span class="s">'survey'</span> | <span class="s">'credits'</span>;
+      spokenText?: string }  <span class="c">// optional last words before teardown</span></code></pre>
+
+    <div class="box good">
+      <span class="lab">Why this is the right shape, not a hack</span>
+      <p><strong>(1) It dissolves the §07.3 display-tool dilemma</strong> — the brain emits display tools <em>exactly as today</em>; the voice layer just detects "this turn needs UI input" and hands off. Voice and the existing text machinery don't fight — they <strong>hand off.</strong> <strong>(2) Pre-stream gates double as voice-gates for free</strong> — credits (#3) and survey (#4) are already checked before the model runs (§06c), so the relay can refuse to start a voice turn and return a <code>handoff</code> immediately. <strong>(3) Completion mid-turn is handled</strong> — when <code>completeSession</code> sets <code>postSurveyOwed</code> (lifecycle #21), the turn resolves to a <code>survey</code> handoff, closing voice and routing the user to the mandatory survey rather than letting them talk past a finished session.</p>
+    </div>
+
+    <div class="box open">
+      <span class="lab">Sub-questions to flesh out later</span>
+      <p>How EA's "I need your input" line is produced (model-generated vs. a canned voice-mode utterance) · whether teardown is graceful (let the current sentence finish) or immediate · the exact Live-button disabled-state UX and how it re-enables (poll vs. event) · whether <code>needs_input</code> should name <em>which</em> tool so the UI can scroll/focus it.</p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section id="built">
+    <h2><span class="num">09</span> What's already built</h2>
+    <p class="sub">The transport layer exists and is validated. <span class="pill built">deployed</span></p>
+
+    <ul class="clean">
+      <li><strong><code>voice-server/</code></strong> — a standalone Node/TS service hosting the Speech Engine WebSocket. Deployed to <strong>Fly.io</strong> (<code>ea-voice-server.fly.dev</code>, region <code>iad</code>, always-warm config so cold-start never bites). Validated end-to-end: live browser voice conversation routed through it, excellent latency.</li>
+      <li><strong><code>src/responders.ts</code></strong> — currently placeholder brains (<code>echo</code>, <code>canned</code>) that prove the transport with zero-dependency output. <strong>This is where the §07.1 decision lands</strong> — either the real EA brain or a relay to Vercel.</li>
+      <li><strong>Responsibility split (settled):</strong> the <strong>Speech Engine WS host</strong> runs on Fly; the <strong>WebRTC token endpoint</strong> runs on Vercel (stateless, auth-gated, rate-limited). The browser talks only to Vercel (token) + ElevenLabs (audio) — never to Fly directly.</li>
+    </ul>
+
+    <div class="box good">
+      <span class="lab">Verified SDK facts (installed @elevenlabs/elevenlabs-js@2.49.1)</span>
+      <p><code>engine.attach(engineId, httpServer, "/ws", callbacks)</code> hosts the WS · <code>onTranscript(transcript, signal, session)</code> delivers full history + an <strong>abort signal that fires on interruption</strong> · <code>session.sendResponse(string | AsyncIterable)</code> streams to TTS and auto-extracts Gemini stream text · new transcript auto-aborts the previous in-flight call (barge-in handled for us).</p>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section id="risks">
+    <h2><span class="num">10</span> Risks &amp; edges to track</h2>
+    <p class="sub">Not blockers — things to keep honest about as we design.</p>
+
+    <div class="box good">
+      <span class="lab">Crisis guardrails — resolved by 7.1</span>
+      <p>The text brain runs <code>buildCrisisContext()</code> (lifecycle #11) and a <code>flagCrisisDetected</code> tool. With <strong>7.1 = brain on Vercel</strong>, these come along for free in the shared brain. <strong>Still a must-verify, not a must-design:</strong> the §06c inventory flags #11 as the single side-effect most likely to be silently dropped — the implementation must prove crisis context is present on a voice turn. Safety is non-negotiable; voice users may be the most vulnerable. A detected crisis also engages the voice-gate (<code>reason: 'crisis'</code>, §08).</p>
+    </div>
+
+    <div class="box warn">
+      <span class="lab">Usage / billing on voice turns — deliberately tabled</span>
+      <p>Text turns deduct 1 message credit in <code>/api/chat</code>'s <code>onFinish</code>. <strong>Decision: table this for now</strong> — there's no clear model yet for what a "voice turn" costs (a turn? a minute? STT/TTS seconds?), and forcing one prematurely would distort the design. The <em>credit-exhaustion gate</em> (refusing to <em>start</em> voice when credits are already zero) is separate and <strong>is</strong> handled — it's a voice-gate trigger (§08). What's tabled is <em>metering consumption during</em> a voice session. Revisit once we have a metering model; until then voice consumes nothing.</p>
+    </div>
+
+    <div class="box good">
+      <span class="lab">Post-survey gate × voice — resolved by the voice-gate</span>
+      <p>Issue #27's global block (<code>forbidden:pending_survey</code>) lives in <code>/api/chat</code>. The <strong>brain-on-Vercel relay re-applies the same pre-turn checks</strong> (<code>checkMessageLimit</code> + owed-survey), so voice can't be an escape hatch around the block. When owed, the relay returns a <code>survey</code> handoff (§08) rather than starting a turn. Also covers completion <em>mid-session</em> (lifecycle #21): <code>completeSession</code> sets <code>postSurveyOwed</code> → next turn resolves to a survey handoff → voice closes, user is routed to the mandatory survey.</p>
+    </div>
+
+    <div class="box warn">
+      <span class="lab">Message ID reconciliation — the live knot in 7.2</span>
+      <p>Two writers exist: the <strong>client</strong> mirrors transcript events into <code>useChat</code> via <code>setMessages</code>, and the <strong>server relay</strong> persists the turn (§07.2 lean). They must agree on message IDs or a page-refresh reload from DB will duplicate what's already on screen. Resolve <em>who owns the ID</em>: either the client generates <code>crypto.randomUUID()</code> and passes it to the relay to persist, or the relay returns its IDs for the client to adopt. Mirrors the existing client-ID-generation pattern that prevents chat-creation races. <strong>This is the remaining open piece of 7.2.</strong></p>
+    </div>
+
+    <div class="box good">
+      <span class="lab">Interruption / barge-in — already handled</span>
+      <p>Speech Engine auto-aborts the in-flight response when the user starts speaking (verified). Our brain call just needs to honor the supplied <code>AbortSignal</code> (the AI&nbsp;SDK <code>streamText</code> accepts one). No bespoke turn-taking engine to build.</p>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section id="checklist">
+    <h2><span class="num">11</span> Implementation checklist (provisional)</h2>
+    <p class="sub">Reflects settled 7.1 + 7.3. One open item (7.2 ID ownership) gates the persistence steps.</p>
+
+    <ol class="clean">
+      <li><strong>Resolve the 7.2 knot</strong> — decide who owns voice message IDs (client vs. relay) so mirror + persistence don't duplicate (§10 risk). Everything in 7.2 follows from this.</li>
+      <li><strong>Extract the brain</strong> from <span class="path">/api/chat/route.ts</span> into <span class="path">src/lib/ai/ea-agent.ts</span> (prompt assembly + model + tools + <code>streamText</code> config), so text and voice share one definition. Refactor the route to consume it (no behavior change to text chat).</li>
+      <li><strong>Add <code>/api/voice-turn</code></strong> (Vercel) — auth-gated, runs the shared brain, re-applies the pre-stream gates (<code>checkMessageLimit</code> + owed-survey + ownership), and returns either a text stream (<code>speak</code>) or a <code>handoff</code> with a reason (§08). <strong>Persists the turn server-side</strong> via the existing <code>persistFinishedMessages</code> path (§07.2 lean).</li>
+      <li><strong>Carry <code>buildCrisisContext</code> through</strong> — explicitly verify the voice path includes crisis context (§06c #11) and that a detected crisis returns a <code>crisis</code> handoff.</li>
+      <li><strong>Point <code>responders.ts</code></strong> (Fly) at <code>/api/voice-turn</code> as a new mode — relay transcript in; on <code>speak</code> stream text to <code>sendResponse</code> honoring the abort signal; on <code>handoff</code> speak the optional last words and signal the client to tear down.</li>
+      <li><strong>Token route</strong> — authenticated Next.js endpoint minting the ElevenLabs WebRTC token (browser-facing, rate-limited).</li>
+      <li><strong>Live button + visualizer</strong> in the chat view — ElevenLabs client SDK; visualizer driven by both audio streams. Button only present inside an existing <code>/chat/{id}</code> (§06b).</li>
+      <li><strong>UI mirror</strong> — wire the client SDK's transcript events into <code>setMessages</code> (user + agent), using the agreed ID-ownership rule (step 1).</li>
+      <li><strong>The voice-gate</strong> — client teardown + Live-button disable keyed on <code>handoff.reason</code>; re-enable when the condition clears (display submitted / lockout over / survey done / credits restored).</li>
+      <li><strong>Verify</strong> — crisis path holds in voice; survey gate not bypassable (incl. mid-session completion); refresh mid-session restores from DB without duplicates.</li>
+    </ol>
+
+    <div class="box good">
+      <span class="lab">Tabled / out of scope for v1</span>
+      <p><strong>Voice usage metering/billing</strong> is deliberately tabled (§10) — no consumption model yet; voice consumes no credits for now (the credit-<em>exhaustion</em> gate still applies). <strong>Coordinated voice + interactive display widgets</strong> (the "full parity" north star) is deferred — in v1 a display tool simply hands off to the UI via the voice-gate. v1 is <strong>hands-free conversation mirrored into the chat view, one brain, one thread, durable history</strong>, with clean handoffs whenever the UI needs the user.</p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <div class="box good">
+    <span class="lab">Summary</span>
+    <p>Speech Engine is a <strong>voice I/O wrapper</strong>, not an agent — it does STT + TTS + turn-taking and hands our server the transcript text both ways, so the EA brain stays <strong>ours</strong>. The vision (Live button, visualizer, hands-free talk appearing live in the same chat thread) is achievable because <code>useChat</code> exposes <strong><code>setMessages</code></strong>: voice is just another source feeding the same message store. <strong>Settled:</strong> the brain runs on <strong>Vercel</strong> and Fly relays to it (7.1) — so the route's load-bearing side-effects (crisis context, gates, persistence, completion) come along in shared code (§06c); and UI-blocking states resolve through one <strong>voice-gate</strong> primitive (7.3) — voice closes deterministically and the Live button relocks whenever the user must act in the UI (display input, crisis, survey, credits). <strong>Voice can never start a conversation</strong> (§06b), which collapses the pre-survey/creation complexity. <strong>Open:</strong> the 7.2 persistence knot — who owns voice message IDs so the client mirror and server persistence don't duplicate. <strong>Tabled:</strong> voice usage billing. Transport is already built and validated on Fly.</p>
+  </div>
+
+  <footer>
+    <span>Issue&nbsp;#72 · Real-Time Voice + TTS</span>
+    <span>Design artifact · in progress</span>
+  </footer>
+
+</div>
+</body>
+</html>
